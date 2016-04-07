@@ -66,42 +66,34 @@ def BDS(start, target):
 
     startNext = None
     targetNext = None
+    
+    frontier_num = {}
+    frontier_node = list()
+    
     while ((not q_start.empty()) and (not q_target.empty())):
+
+        for x in q_start.queue:
+            tmpList = getPossibleNext(x)
+            for y in tmpList:
+                if y not in frontier_num:
+                    frontier_num[y] = 1
+                    tmpNode = Node(y)
+                    tmpNode.parent = x
+                    frontier_node.append(tmpNode)
+        for x in frontier_node:
+            for y in q_target.queue:
+                if x.state == y.state:
+                    tmpNode_target = Node(x.parent.state)
+                    tmpNode_target.parent = y
+                    solvable = True
+                    print('c')
+                    return [x, tmpNode_target]
+                
         tmpStart = q_start.get()
         tmpTarget = q_target.get()
 
         startNext = getPossibleNext(tmpStart)
-##        for x in startNext:
-##            tmpNode = Node(x)
-##            tmpNode.parent = tmpStart
-##            tmpNode_target = Node(tmpStart.state)
-##            if x == target.state:
-##                solvable = True
-##                tmpNode_target.parent = target
-##                print('a')
-##                return [tmpNode, tmpNode_target]
-##            for y in list(q_target.queue):
-##                if x == y.state:
-##                    solvable = True
-##                    tmpNode_target.parent = y
-##                    print('d')
-##                    return [tmpNode, tmpNode_target]
-##                if x == tmpTarget.state:
-##                    solvable = True
-##                    tmpNode_target.parent = tmpTarget
-##                    print('e')
-##                    return [tmpNode, tmpNode_target]
         targetNext = getPossibleNext(tmpTarget)
-
-        frontier = list()
-        for x in q_start.queue:
-            tmpList = getPossibleNext(x)
-            for y in tmpList:
-                frontier.append(y)
-
-        for x in frontier:
-            tmpNode = Node(x)
-            tmpNode.parent = tmpStart
         
         for x in startNext:
             tmpNode = Node(x)

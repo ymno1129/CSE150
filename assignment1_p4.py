@@ -71,29 +71,37 @@ def BDS(start, target):
         tmpTarget = q_target.get()
 
         startNext = getPossibleNext(tmpStart)
-        for x in startNext:
+##        for x in startNext:
+##            tmpNode = Node(x)
+##            tmpNode.parent = tmpStart
+##            tmpNode_target = Node(tmpStart.state)
+##            if x == target.state:
+##                solvable = True
+##                tmpNode_target.parent = target
+##                print('a')
+##                return [tmpNode, tmpNode_target]
+##            for y in list(q_target.queue):
+##                if x == y.state:
+##                    solvable = True
+##                    tmpNode_target.parent = y
+##                    print('d')
+##                    return [tmpNode, tmpNode_target]
+##                if x == tmpTarget.state:
+##                    solvable = True
+##                    tmpNode_target.parent = tmpTarget
+##                    print('e')
+##                    return [tmpNode, tmpNode_target]
+        targetNext = getPossibleNext(tmpTarget)
+
+        frontier = list()
+        for x in q_start.queue:
+            tmpList = getPossibleNext(x)
+            for y in tmpList:
+                frontier.append(y)
+
+        for x in frontier:
             tmpNode = Node(x)
             tmpNode.parent = tmpStart
-            tmpNode_target = Node(tmpStart.state)
-            if x == target.state:
-                solvable = True
-                tmpNode_target.parent = target
-                print('a')
-                return [tmpNode, tmpNode_target]
-            for y in list(q_target.queue):
-                if x == y.state:
-                    solvable = True
-                    tmpNode_target.parent = y
-                    print('d')
-                    return [tmpNode, tmpNode_target]
-                if x == tmpTarget.state:
-                    solvable = True
-                    tmpNode_target.parent = tmpTarget
-                    print('e')
-                    return [tmpNode, tmpNode_target]
-        targetNext = getPossibleNext(tmpTarget)
-        print('163 in startNext', 163 in startNext)
-        print('263 in targetNext', 263 in targetNext)
         
         for x in startNext:
             tmpNode = Node(x)

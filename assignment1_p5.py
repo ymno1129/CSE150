@@ -6,7 +6,10 @@ class Node:
     state = None
     parent = None
 
+    #g(n) representing cost from goal to this node
     distFromGoal = None
+
+    #h(n) representing cost from this node to goal
     distToGoal = None
 
     def __init__(self, state):

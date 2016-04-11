@@ -1,7 +1,13 @@
 import sys
 import math
 import queue
+import time
 
+'''
+The node class
+Has a state representing the number and
+a parent representing its previous number
+'''
 class Node:
     state = None
     parent = None
@@ -12,7 +18,11 @@ class Node:
 #hash table holding prime numbers(int)
 table = {}
 solvable = False
+visited = 0
 
+'''
+The function for checking if a number is prime
+'''
 def isPrime(n):
     if n % 2 == 0 and n > 2:
         return False
@@ -21,7 +31,10 @@ def isPrime(n):
             return False
     return True
 
-
+'''
+The function for generating all possible prime numbers resulting from
+changing one digit of current number
+'''
 def getPossibleNext(current):
     currNum = current.state
     next_list = []
@@ -61,12 +74,17 @@ def getPossibleNext(current):
 
     return next_list
 
+'''
+Breadth first search
+'''
 def BFS(start, target):
+    global visited
     q = queue.Queue(0)
     q.put(start)
 
     while not q.empty():
         tmpNode = q.get()
+        visited = visited + 1
         tmpList = getPossibleNext(tmpNode)      
        
         for x in tmpList:
@@ -87,14 +105,18 @@ def main():
     root = Node(startPrime)
     table[startPrime] = 1
 
-
+    # calculate time
+    startTime = time.clock()
     result = BFS(root, endPrime)
+    print("--- %.5f seconds ---" % (time.clock() - startTime))
+    print('Nodes visited: ', visited)
 
     if (solvable):
         stack = list()
         while (result != None):
             stack.append(result.state)
-            result = result.parent 
+            result = result.parent
+        print('Path length: ', len(stack))
         while (stack):
             print(stack.pop(), end=" ")
     

@@ -1,6 +1,7 @@
 import sys
 import math
 import queue
+import time
 
 class Node:
     state = None
@@ -13,6 +14,7 @@ class Node:
 table_start = {}
 table_target = {}
 solvable = False
+visited = 0
 
 def isPrime(n):
     if n % 2 == 0 and n > 2:
@@ -63,6 +65,7 @@ def BDS(start, target):
     q_target.put(target)
 
     global solvable
+    global visited 
 
     startNext = None
     targetNext = None
@@ -91,6 +94,7 @@ def BDS(start, target):
                 
         tmpStart = q_start.get()
         tmpTarget = q_target.get()
+        visited = visited + 2
 
         startNext = getPossibleNext(tmpStart)
         targetNext = getPossibleNext(tmpTarget)
@@ -129,8 +133,12 @@ def main():
     target = Node(endPrime)
     table_target[endPrime] = 1
 
-    result = BDS(root, target)
 
+    startTime = time.clock()
+    result = BDS(root, target)
+    print("--- %.5f seconds ---" % (time.clock() - startTime))
+    print('Nodes visited: ', visited)
+    
     if (solvable):
         resultFromStart = result[0]
         resultFromTaget = result[1]

@@ -42,6 +42,8 @@ def getPossibleNext(current):
     next_list = []
     length = len(str(currNum))
     
+    localTable = {}
+    
     #manipulate every digit
     for x in range(length, 0, -1):
         offset = math.pow(10, x - 1)
@@ -59,12 +61,12 @@ def getPossibleNext(current):
         #for each digit, ten possible variations
         for y in range(0, 10):
            next = tmpNum + y * offset
-           
-           if (next in table):
+
+           if next in localTable:
                continue
 
-           table[next] = 1
-            
+           localTable[next] = 1
+           
            #discard the number starts with 0
            if len(str(int(next)))==length:
                #check if the number is a prime
@@ -81,6 +83,7 @@ Depth limited Search
 '''
 def DLS(start, target):
     global visited
+    global solvable
     stack = list()
     stack.append(start)
 
@@ -94,7 +97,6 @@ def DLS(start, target):
         currDepth = tmpNode.depth
         
         if (tmpNode.state == target):
-            global solvable
             solvable = True
             return tmpNode
 
@@ -104,6 +106,9 @@ def DLS(start, target):
         tmpList = getPossibleNext(tmpNode)
         
         for x in tmpList:
+            if (x.state == target):
+                solvable = True
+                return x
             x.depth = (currDepth) + 1
             stack.append(x)
             
@@ -119,6 +124,11 @@ def main():
     root.depth = 0
     table[startPrime] = 1
 
+    s = set()
+    s.add(1)
+    s.add(1)
+    print(len(s))
+    
     # calculate time
     startTime = time.clock()
     result = DLS(root, endPrime)

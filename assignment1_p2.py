@@ -1,6 +1,11 @@
 import sys
 import math
-import queue
+is_py2 = sys.version[0] == '2'
+if is_py2:
+    import Queue as queue
+else:
+    import queue as queue
+#import queue
 import time
 
 '''
@@ -18,9 +23,7 @@ class Node:
         self.state = state
 
 #hash table holding prime numbers(int)
-table = {}
 solvable = False
-visited = 0
 
 '''
 The function for checking if a number is prime
@@ -82,7 +85,6 @@ def getPossibleNext(current):
 Depth limited Search
 '''
 def DLS(start, target):
-    global visited
     global solvable
     stack = list()
     stack.append(start)
@@ -90,9 +92,7 @@ def DLS(start, target):
     currDepth = None
 
     while(len(stack) != 0):
-        
         tmpNode = stack.pop()
-        visited = visited + 1
         
         currDepth = tmpNode.depth
         
@@ -116,33 +116,30 @@ def DLS(start, target):
         
 
 def main():
-    primes = str(sys.stdin.readline()).split()
-    startPrime = int(primes[0])
-    endPrime = int(primes[1])
-    
-    root = Node(startPrime)
-    root.depth = 0
-    table[startPrime] = 1
+#inputName = sys.argv[1]
+#    f = open(inputName, "r")
+    for line in sys.stdin:
+        primes = str(line).split()
+        startPrime = int(primes[0])
+        endPrime = int(primes[1])
+        
+        if (not isPrime(startPrime) or not isPrime(endPrime)):
+            print("The two input number should be prime numbers!")
+            continue
 
-    s = set()
-    s.add(1)
-    s.add(1)
-    print(len(s))
-    
-    # calculate time
-    startTime = time.clock()
-    result = DLS(root, endPrime)
-    print("--- %.5f seconds ---" % (time.clock() - startTime))
-    print('Nodes visited: ', visited)
-    
-    if (solvable):
-        stack = list()
-        while (result != None):
-            stack.append(result.state)
-            result = result.parent
-        print('Path length:' ,len(stack))
-        while (stack):
-            print(stack.pop(), end=" ")
+        root = Node(startPrime)
+        root.depth = 0
+
+        result = DLS(root, endPrime)
+            
+        if (solvable):
+            stack = list()
+            while (result != None):
+                stack.append(result.state)
+                result = result.parent
+            while (stack):
+                sys.stdout.write(str(stack.pop()) + " ")
+        sys.stdout.write('\n')
 
 
 if __name__ == '__main__':

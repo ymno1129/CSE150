@@ -1,20 +1,44 @@
 import sys
 import math
-import queue
+is_py2 = sys.version[0] == '2'
+if is_py2:
+    import Queue as queue
+else:
+    import queue as queue
+#import queue
 import time
 
 class Node:
     state = None
     parent = None
 
+    #g(n) representing cost from goal to this node
+    distFromGoal = None
+
+    #h(n) representing cost from this node to goal
+    distToGoal = None
+
     def __init__(self, state):
         self.state = state
+
+    def __lt__(self, other):
+         return ((self.distFromGoal + self.distToGoal) <
+                (other.distFromGoal + other.distToGoal))
 
 #hash table holding prime numbers(int)
 table_start = {}
 table_target = {}
 solvable = False
-visited = 0
+
+def hammingDistance(a, b):
+    if len(str(a)) != len(str(b)):
+        return 999
+    dist = 0
+    for x in range(0, len(str(a))):
+        if str(a)[x] != str(b)[x]:
+            dist = dist + 1
+    return dist
+
 
 def isPrime(n):
     if n % 2 == 0 and n > 2:
@@ -30,92 +54,70 @@ def getPossibleNext(current):
     next_list = []
     length = len(str(currNum))
     
-    #manipulate every digit
     for x in range(length, 0, -1):
         offset = math.pow(10, x - 1)
         
         currDigit = int(str(currNum)[length - x])
 
-        # subtract offset * currDigit from currNum
-        # for example, if currNum is 23, then when
-        # manipulating the first digit, subtract it
-        # by 20 and start with 3.
-        # when manipulating the second digit, subtract
-        # int by 3 and start with 20.
         tmpNum = currNum - (currDigit * offset)
         
-        #for each digit, ten possible variations
         for y in range(0, 10):
            next = tmpNum + y * offset
             
-           #discard the number starts with 0
            if len(str(int(next)))==length:
-               #check if the number is a prime
                if isPrime(int(next)):
-                   #add the number to list
                    next_list.append(int(next))
 
     return next_list
 
 def BDS(start, target):
-    q_start = queue.Queue(0)
+    global solvable
+    if (start.state == target.state):
+        result = start.state
+        sys.stdout.write(str(result))
+        sys.stdout.write('\n')
+        return 
+
+    q_start = queue.PriorityQueue()
     q_start.put(start)
 
     q_target = queue.Queue(0)
     q_target.put(target)
 
-    global solvable
-    global visited 
-
     startNext = None
     targetNext = None
     
-    frontier_num = {}
-    frontier_node = list()
-    
     while ((not q_start.empty()) and (not q_target.empty())):
-
-        for x in q_start.queue:
-            tmpList = getPossibleNext(x)
-            for y in tmpList:
-                if y not in frontier_num:
-                    frontier_num[y] = 1
-                    tmpNode = Node(y)
-                    tmpNode.parent = x
-                    frontier_node.append(tmpNode)
-        for x in frontier_node:
-            for y in q_target.queue:
-                if x.state == y.state:
-                    tmpNode_target = Node(x.parent.state)
-                    tmpNode_target.parent = y
-                    solvable = True
-                    print('c')
-                    return [x, tmpNode_target]
-                
         tmpStart = q_start.get()
         tmpTarget = q_target.get()
-        visited = visited + 2
 
         startNext = getPossibleNext(tmpStart)
         targetNext = getPossibleNext(tmpTarget)
         
         for x in startNext:
             tmpNode = Node(x)
-            tmpNode.parent = tmpStart   
-            if x in targetNext:
+            tmpNode.parent = tmpStart
+            tmpNode.distFromGoal = tmpStart.distFromGoal + 1
+            if x in table_target:
                 solvable = True
-                tmpNode_target = Node(x)
-                tmpNode_target.parent = tmpTarget
-                print('b')
+                tmpNode_target = Node(tmpStart.state)
+                tmpNode_target.parent = table_target[x]
                 return [tmpNode, tmpNode_target]      
             if x not in table_start:
-                table_start[x] = 1
-                q_start.put(tmpNode)            
+                tmpNode.distToGoal = hammingDistance(tmpNode.state, target.state)
+                table_start[x] = tmpNode
+                q_start.put(tmpNode)
+
         for x in targetNext:      
             tmpNode = Node(x)
             tmpNode.parent = tmpTarget     
+            if x in table_start:
+                solvable = True
+                tmpNode_target = Node(x)
+                tmpNode_target.parent = tmpTarget
+                return [table_start[x], tmpNode_target]
             if x not in table_target:
-                table_target[x] = 1
+                table_target[x] = tmpNode
                 q_target.put(tmpNode)
 
             
@@ -123,38 +125,50 @@ def BDS(start, target):
    
 
 def main():
-    primes = str(sys.stdin.readline()).split()
-    startPrime = int(primes[0])
-    endPrime = int(primes[1])
-    
-    root = Node(startPrime)
-    table_start[startPrime] = 1
-    
-    target = Node(endPrime)
-    table_target[endPrime] = 1
+#inputName = sys.argv[1]
+#f = open(inputName, "r")
+    global table_start
+    global table_target
+    for line in sys.stdin:
+        table_start = {}
+        table_target = {}
 
-
-    startTime = time.clock()
-    result = BDS(root, target)
-    print("--- %.5f seconds ---" % (time.clock() - startTime))
-    print('Nodes visited: ', visited)
+        primes = str(line).split()
+        startPrime = int(primes[0])
+        endPrime = int(primes[1])
+        
+        if (not isPrime(startPrime) or not isPrime(endPrime)):
+            print("The two input number should be prime numbers!")
+            continue
     
-    if (solvable):
-        resultFromStart = result[0]
-        resultFromTaget = result[1]
-        stack = list()
-        while (resultFromStart != None):
-            stack.append(resultFromStart.state)
-            resultFromStart = resultFromStart.parent 
-        while (stack):
-            print(stack.pop(), end=" ")
-        print()
-        stack = list()
-        while (resultFromTaget != None):
-            stack.append(resultFromTaget.state)
-            resultFromTaget = resultFromTaget.parent 
-        while (stack):
-            print(stack.pop(), end=" ")
+        root = Node(startPrime)
+        root.distFromGoal = 0
+        table_start[startPrime] = root
+    
+        target = Node(endPrime)
+        table_target[endPrime] = target
+
+#startTime = time.clock()
+        result = BDS(root, target)
+#print("--- %.5f seconds ---" % (time.clock() - startTime))
+    
+        if (solvable):
+            resultFromStart = result[0]
+            resultFromTarget = result[1]
+            stack = list()
+            while (resultFromStart != None):
+                stack.append(resultFromStart.state)
+                resultFromStart = resultFromStart.parent 
+            while (stack):
+                sys.stdout.write(str(stack.pop()) + " ")
+            sys.stdout.write('\n')
+            stack = list()
+            while (resultFromTarget != None):
+                stack.append(resultFromTarget.state)
+                resultFromTarget = resultFromTarget.parent 
+            while (stack):
+                sys.stdout.write(str(stack.pop()) + " ")
+            sys.stdout.write('\n') 
 
 if __name__ == '__main__':
     main()

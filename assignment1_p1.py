@@ -1,6 +1,11 @@
 import sys
 import math
-import queue
+is_py2 = sys.version[0] == '2'
+if is_py2:
+    import Queue as queue
+else:
+    import queue as queue
+#import queue
 import time
 
 '''
@@ -78,18 +83,21 @@ def getPossibleNext(current):
 Breadth first search
 '''
 def BFS(start, target):
-    global visited
+    global solvable
     q = queue.Queue(0)
     q.put(start)
 
+    if start.state == target:
+        solvable = True
+        return start
+
     while not q.empty():
         tmpNode = q.get()
-        visited = visited + 1
+        
         tmpList = getPossibleNext(tmpNode)      
        
         for x in tmpList:
             if (x.state == target):
-                global solvable
                 solvable = True
                 return x
             q.put(x)
@@ -98,28 +106,35 @@ def BFS(start, target):
     return
 
 def main():
-    primes = str(sys.stdin.readline()).split()
-    startPrime = int(primes[0])
-    endPrime = int(primes[1])
     
-    root = Node(startPrime)
-    table[startPrime] = 1
+#inputName = sys.argv[1]
+#f = open(inputName, "r")
+    global table
+    for line in sys.stdin:
+        table = {}
+        primes = str(line).split()
+        startPrime = int(primes[0])
+        endPrime = int(primes[1])
 
-    # calculate time
-    startTime = time.clock()
-    result = BFS(root, endPrime)
-    print("--- %.5f seconds ---" % (time.clock() - startTime))
-    print('Nodes visited: ', visited)
+        if (not isPrime(startPrime) or not isPrime(endPrime)):
+            print("The two input number should be prime numbers!")
+            continue
 
-    if (solvable):
-        stack = list()
-        while (result != None):
-            stack.append(result.state)
-            result = result.parent
-        print('Path length: ', len(stack))
-        while (stack):
-            print(stack.pop(), end=" ")
-    
+        root = Node(startPrime)
+        table[startPrime] = 1
+
+        result = BFS(root, endPrime)
+            
+        if (solvable):
+            stack = list()
+            while (result != None):
+                stack.append(result.state)
+                result = result.parent
+            while (stack):
+#curr = str(stack.pop()) + " "
+#print curr
+                sys.stdout.write(str(stack.pop()) + " ")
+        sys.stdout.write('\n')
 
 if __name__ == '__main__':
     main()

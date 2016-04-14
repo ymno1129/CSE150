@@ -75,7 +75,6 @@ def BDS(start, target):
     if (start.state == target.state):
         result = start.state
         sys.stdout.write(str(result))
-        sys.stdout.write('\n')
         return 
 
     q_start = queue.PriorityQueue()
@@ -168,7 +167,7 @@ def main():
                 resultFromTarget = resultFromTarget.parent 
             while (stack):
                 sys.stdout.write(str(stack.pop()) + " ")
-            sys.stdout.write('\n') 
+        sys.stdout.write('\n') 
 
 if __name__ == '__main__':
     main()

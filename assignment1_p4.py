@@ -121,7 +121,7 @@ def BDS(start, target):
                 q_target.put(tmpNode)
 
             
-    print("UNSOLVABLE")
+    sys.stdout.write("UNSOLVABLE")
    
 
 def main():

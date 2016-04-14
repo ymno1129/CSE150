@@ -112,7 +112,7 @@ def DLS(start, target):
             x.depth = (currDepth) + 1
             stack.append(x)
             
-    print("UNSOLVABLE")
+    sys.stdout.write("UNSOLVABLE")
         
 
 def main():

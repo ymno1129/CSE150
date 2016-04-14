@@ -111,7 +111,7 @@ def Astar(start, target):
             x.distToGoal = tmpHammDist
             pq.put(x)
 
-    print("UNSOLVABLE")
+    sys.stdout.write("UNSOLVABLE")
     return
 
 def main():

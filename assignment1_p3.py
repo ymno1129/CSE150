@@ -101,7 +101,7 @@ def IDFS(start, target):
         global table
         table = {}
             
-    print("UNSOLVABLE")
+    sys.stdout.write("UNSOLVABLE")
         
 
 def main():

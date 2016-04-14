@@ -102,7 +102,7 @@ def BFS(start, target):
                 return x
             q.put(x)
 
-    print("UNSOLVABLE")
+    sys.stdout.write("UNSOLVABLE")
     return
 
 def main():

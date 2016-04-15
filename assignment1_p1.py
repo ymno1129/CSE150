@@ -29,6 +29,8 @@ visited = 0
 The function for checking if a number is prime
 '''
 def isPrime(n):
+    if n == 1:
+        return False
     if n % 2 == 0 and n > 2:
         return False
     for i in range(3, int(math.sqrt(n)) + 1, 2):
@@ -51,15 +53,8 @@ def getPossibleNext(current):
         
         currDigit = int(str(currNum)[length - x])
 
-        # subtract offset * currDigit from currNum
-        # for example, if currNum is 23, then when
-        # manipulating the first digit, subtract it
-        # by 20 and start with 3.
-        # when manipulating the second digit, subtract
-        # int by 3 and start with 20.
         tmpNum = currNum - (currDigit * offset)
         
-        #for each digit, ten possible variations
         for y in range(0, 10):
            next = tmpNum + y * offset
            
@@ -68,7 +63,6 @@ def getPossibleNext(current):
 
            table[next] = 1
             
-           #discard the number starts with 0
            if len(str(int(next)))==length:
                #check if the number is a prime
                if isPrime(int(next)):
@@ -106,9 +100,6 @@ def BFS(start, target):
     return
 
 def main():
-    
-#inputName = sys.argv[1]
-#f = open(inputName, "r")
     global table
     for line in sys.stdin:
         table = {}
@@ -131,8 +122,6 @@ def main():
                 stack.append(result.state)
                 result = result.parent
             while (stack):
-#curr = str(stack.pop()) + " "
-#print curr
                 sys.stdout.write(str(stack.pop()) + " ")
         sys.stdout.write('\n')
 

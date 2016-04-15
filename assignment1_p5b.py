@@ -41,6 +41,8 @@ def hammingDistance(a, b):
     return dist
 
 def isPrime(n):
+    if n == 1:
+        return False
     if n % 2 == 0 and n > 2:
         return False
     for i in range(3, int(math.sqrt(n)) + 1, 2):
@@ -60,12 +62,6 @@ def getPossibleNext(current):
         
         currDigit = int(str(currNum)[length - x])
 
-        # subtract offset * currDigit from currNum
-        # for example, if currNum is 23, then when
-        # manipulating the first digit, subtract it
-        # by 20 and start with 3.
-        # when manipulating the second digit, subtract
-        # int by 3 and start with 20.
         tmpNum = currNum - (currDigit * offset)
         
         #for each digit, ten possible variations
@@ -116,8 +112,6 @@ def Astar(start, target):
 
 def main():
     global table
-#inputName = sys.argv[1]
-#f = open(inputName, "r")
     for line in sys.stdin:
         table = {}
         primes = str(line).split()

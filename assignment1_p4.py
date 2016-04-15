@@ -41,6 +41,8 @@ def hammingDistance(a, b):
 
 
 def isPrime(n):
+    if n == 1:
+        return False
     if n % 2 == 0 and n > 2:
         return False
     for i in range(3, int(math.sqrt(n)) + 1, 2):
@@ -125,8 +127,6 @@ def BDS(start, target):
    
 
 def main():
-#inputName = sys.argv[1]
-#f = open(inputName, "r")
     global table_start
     global table_target
     for line in sys.stdin:

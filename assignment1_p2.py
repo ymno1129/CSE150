@@ -5,7 +5,6 @@ if is_py2:
     import Queue as queue
 else:
     import queue as queue
-#import queue
 import time
 
 '''
@@ -23,12 +22,15 @@ class Node:
         self.state = state
 
 #hash table holding prime numbers(int)
+table = {}
 solvable = False
 
 '''
 The function for checking if a number is prime
 '''
 def isPrime(n):
+    if n == 1:
+        return False
     if n % 2 == 0 and n > 2:
         return False
     for i in range(3, int(math.sqrt(n)) + 1, 2):
@@ -52,16 +54,9 @@ def getPossibleNext(current):
         offset = math.pow(10, x - 1)
         
         currDigit = int(str(currNum)[length - x])
-
-        # subtract offset * currDigit from currNum
-        # for example, if currNum is 23, then when
-        # manipulating the first digit, subtract it
-        # by 20 and start with 3.
-        # when manipulating the second digit, subtract
-        # int by 3 and start with 20.
+        
         tmpNum = currNum - (currDigit * offset)
         
-        #for each digit, ten possible variations
         for y in range(0, 10):
            next = tmpNum + y * offset
 
@@ -80,21 +75,27 @@ def getPossibleNext(current):
                    next_list.append(tmpNode)
 
     return next_list
+    
 
 '''
 Depth limited Search
 '''
 def DLS(start, target):
     global solvable
+    global table
     stack = list()
     stack.append(start)
 
     currDepth = None
+    lastDepth = 0
 
     while(len(stack) != 0):
         tmpNode = stack.pop()
         
         currDepth = tmpNode.depth
+        #if (currDepth <= lastDepth - 2):
+        #    table = {}
+        lastDepth = currDepth
         
         if (tmpNode.state == target):
             solvable = True
@@ -109,8 +110,10 @@ def DLS(start, target):
             if (x.state == target):
                 solvable = True
                 return x
-            x.depth = (currDepth) + 1
-            stack.append(x)
+            if x.state not in table:
+                x.depth = (currDepth) + 1
+                stack.append(x)
+                table[x.state] = 1
             
     sys.stdout.write("UNSOLVABLE")
         
@@ -118,7 +121,9 @@ def DLS(start, target):
 def main():
 #inputName = sys.argv[1]
 #    f = open(inputName, "r")
+    global table
     for line in sys.stdin:
+        table = {}
         primes = str(line).split()
         startPrime = int(primes[0])
         endPrime = int(primes[1])
@@ -129,6 +134,7 @@ def main():
 
         root = Node(startPrime)
         root.depth = 0
+        table[startPrime] = 1
 
         result = DLS(root, endPrime)
             

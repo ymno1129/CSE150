@@ -5,7 +5,6 @@ if is_py2:
     import Queue as queue
 else:
     import queue as queue
-#import queue
 import time
 
 class Node:
@@ -29,6 +28,7 @@ class Node:
 #hash table holding prime numbers(int)
 table = {}
 solvable = False
+visited = 0
 
 def hammingDistance(a, b):
     if len(str(a)) != len(str(b)):
@@ -41,7 +41,7 @@ def hammingDistance(a, b):
     return dist
 
 def isPrime(n):
-    if n == 1:
+    if n == 1 or n == 0:
         return False
     if n % 2 == 0 and n > 2:
         return False
@@ -86,6 +86,7 @@ def getPossibleNext(current):
     return next_list
 
 def Astar(start, target):
+    global visited
     global solvable
     pq = queue.PriorityQueue()
     pq.put(start)
@@ -96,6 +97,7 @@ def Astar(start, target):
 
     while not pq.empty():
         tmpNode = pq.get()
+        visited = visited + 1
         
         tmpList = getPossibleNext(tmpNode)      
        
@@ -112,7 +114,9 @@ def Astar(start, target):
 
 def main():
     global table
+    global solvable
     for line in sys.stdin:
+        solvable = False
         table = {}
         primes = str(line).split()
         startPrime = int(primes[0])
@@ -130,9 +134,10 @@ def main():
         root.distFromGoal = 0
 
         table[startPrime] = 1
-
-        result = Astar(root, endPrime)
-            
+#startTime = time.clock()
+        result = Astar(root, endPrime)   
+#print("--- %.5f seconds ---" % (time.clock() - startTime))
+#print('visited nodes: ', visited)     
         if (solvable):
             stack = list()
             while (result != None):

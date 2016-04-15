@@ -24,12 +24,13 @@ class Node:
 #hash table holding prime numbers(int)
 table = {}
 solvable = False
+visited = None
 
 '''
 The function for checking if a number is prime
 '''
 def isPrime(n):
-    if n == 1:
+    if n == 1 or n == 0:
         return False
     if n % 2 == 0 and n > 2:
         return False
@@ -44,11 +45,11 @@ changing one digit of current number
 '''
 def getPossibleNext(current):
     currNum = current.state
+    currDepth = current.depth
+
     next_list = []
     length = len(str(currNum))
-    
-    localTable = {}
-    
+     
     #manipulate every digit
     for x in range(length, 0, -1):
         offset = math.pow(10, x - 1)
@@ -58,20 +59,20 @@ def getPossibleNext(current):
         tmpNum = currNum - (currDigit * offset)
         
         for y in range(0, 10):
-           next = tmpNum + y * offset
+           next = int(tmpNum + y * offset)
 
-           if next in localTable:
-               continue
-
-           localTable[next] = 1
+           if next in table:
+               if table[next] <= currDepth:
+                   continue
            
            #discard the number starts with 0
-           if len(str(int(next)))==length:
+           if len(str(next))==length:
                #check if the number is a prime
-               if isPrime(int(next)):
+               if isPrime(next):
                    #add the number to list
-                   tmpNode = Node(int(next))
+                   tmpNode = Node(next)
                    tmpNode.parent = current
+                   tmpNode.depth = current.depth + 1
                    next_list.append(tmpNode)
 
     return next_list
@@ -81,21 +82,20 @@ def getPossibleNext(current):
 Depth limited Search
 '''
 def DLS(start, target):
+    global visited
     global solvable
     global table
     stack = list()
     stack.append(start)
 
     currDepth = None
-    lastDepth = 0
 
+    visited = 0
     while(len(stack) != 0):
         tmpNode = stack.pop()
+        visited = visited + 1
         
         currDepth = tmpNode.depth
-        #if (currDepth <= lastDepth - 2):
-        #    table = {}
-        lastDepth = currDepth
         
         if (tmpNode.state == target):
             solvable = True
@@ -110,19 +110,16 @@ def DLS(start, target):
             if (x.state == target):
                 solvable = True
                 return x
-            if x.state not in table:
-                x.depth = (currDepth) + 1
-                stack.append(x)
-                table[x.state] = 1
+            stack.append(x)
             
     sys.stdout.write("UNSOLVABLE")
         
 
 def main():
-#inputName = sys.argv[1]
-#    f = open(inputName, "r")
     global table
+    global solvable
     for line in sys.stdin:
+        solvable = False
         table = {}
         primes = str(line).split()
         startPrime = int(primes[0])
@@ -136,8 +133,11 @@ def main():
         root.depth = 0
         table[startPrime] = 1
 
+#startTime = time.clock()
         result = DLS(root, endPrime)
-            
+#print("--- %.5f seconds ---" % (time.clock() - startTime))
+#print('visited nodes: ', visited)
+
         if (solvable):
             stack = list()
             while (result != None):

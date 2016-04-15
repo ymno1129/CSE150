@@ -29,6 +29,7 @@ class Node:
 table_start = {}
 table_target = {}
 solvable = False
+visited = 0
 
 def hammingDistance(a, b):
     if len(str(a)) != len(str(b)):
@@ -41,7 +42,7 @@ def hammingDistance(a, b):
 
 
 def isPrime(n):
-    if n == 1:
+    if n == 1 or n == 0:
         return False
     if n % 2 == 0 and n > 2:
         return False
@@ -73,12 +74,11 @@ def getPossibleNext(current):
     return next_list
 
 def BDS(start, target):
+    global visited
     global solvable
     if (start.state == target.state):
-        result = start.state
-        sys.stdout.write(str(result))
-        sys.stdout.write('\n')
-        return 
+        solvable = True
+        return [start, target]    
 
     q_start = queue.PriorityQueue()
     q_start.put(start)
@@ -92,6 +92,7 @@ def BDS(start, target):
     while ((not q_start.empty()) and (not q_target.empty())):
         tmpStart = q_start.get()
         tmpTarget = q_target.get()
+        visited = visited + 2
 
         startNext = getPossibleNext(tmpStart)
         targetNext = getPossibleNext(tmpTarget)
@@ -129,7 +130,9 @@ def BDS(start, target):
 def main():
     global table_start
     global table_target
+    global solvable
     for line in sys.stdin:
+        solvable = False
         table_start = {}
         table_target = {}
 
@@ -148,10 +151,8 @@ def main():
         target = Node(endPrime)
         table_target[endPrime] = target
 
-#startTime = time.clock()
         result = BDS(root, target)
-#print("--- %.5f seconds ---" % (time.clock() - startTime))
-    
+
         if (solvable):
             resultFromStart = result[0]
             resultFromTarget = result[1]
@@ -168,7 +169,7 @@ def main():
                 resultFromTarget = resultFromTarget.parent 
             while (stack):
                 sys.stdout.write(str(stack.pop()) + " ")
-            sys.stdout.write('\n') 
+        sys.stdout.write('\n') 
 
 if __name__ == '__main__':
     main()

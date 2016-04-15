@@ -29,7 +29,7 @@ visited = 0
 The function for checking if a number is prime
 '''
 def isPrime(n):
-    if n == 1:
+    if n == 1 or n == 0:
         return False
     if n % 2 == 0 and n > 2:
         return False
@@ -78,6 +78,7 @@ Breadth first search
 '''
 def BFS(start, target):
     global solvable
+    global visited
     q = queue.Queue(0)
     q.put(start)
 
@@ -87,6 +88,7 @@ def BFS(start, target):
 
     while not q.empty():
         tmpNode = q.get()
+        visited = visited + 1
         
         tmpList = getPossibleNext(tmpNode)      
        
@@ -101,7 +103,9 @@ def BFS(start, target):
 
 def main():
     global table
+    global solvable
     for line in sys.stdin:
+        solvable = False
         table = {}
         primes = str(line).split()
         startPrime = int(primes[0])
@@ -113,9 +117,10 @@ def main():
 
         root = Node(startPrime)
         table[startPrime] = 1
-
+#startTime = time.clock()
         result = BFS(root, endPrime)
-            
+#print("--- %.5f seconds ---" % (time.clock() - startTime))
+#print('visited nodes: ', visited)    
         if (solvable):
             stack = list()
             while (result != None):

@@ -41,7 +41,7 @@ def hammingDistance(a, b):
     return dist
 
 def isPrime(n):
-    if n == 1:
+    if n == 1 or n == 0:
         return False
     if n % 2 == 0 and n > 2:
         return False
@@ -112,7 +112,9 @@ def Astar(start, target):
 
 def main():
     global table
+    global solvable
     for line in sys.stdin:
+        solvable = False
         table = {}
         primes = str(line).split()
         startPrime = int(primes[0])

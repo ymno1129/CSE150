@@ -5,7 +5,6 @@ if is_py2:
     import Queue as queue
 else:
     import queue as queue
-#import queue
 import time
 
 class Node:
@@ -18,17 +17,24 @@ class Node:
     #h(n) representing cost from this node to goal
     distToGoal = None
 
+    nextPossible = None
+
     def __init__(self, state):
         self.state = state
 
     def __lt__(self, other):
-         return ((self.distFromGoal + self.distToGoal) <
+        if ((self.distFromGoal + self.distToGoal) == 
+        (other.distFromGoal + other.distToGoal)):
+            return (self.nextPossible > other.nextPossible)
+        else:
+            return ((self.distFromGoal + self.distToGoal) <
                 (other.distFromGoal + other.distToGoal))
 
 
 #hash table holding prime numbers(int)
 table = {}
 solvable = False
+visited = 0
 
 def hammingDistance(a, b):
     if len(str(a)) != len(str(b)):
@@ -50,6 +56,21 @@ def isPrime(n):
             return False
     return True
 
+def peekPossibleNext(current):
+    result = 0
+    length = len(str(current))
+    for x in range(length, 0, -1):
+        offset = math.pow(10, x - 1)
+        currDigit = int(str(current)[length - x])
+        tmpNum = current - (currDigit * offset)
+        for y in range(0, 10):
+           next = tmpNum + y * offset
+           if (next in table):
+               continue
+           if len(str(int(next)))==length:
+               if isPrime(int(next)):
+                   result = result + 1
+    return result
 
 def getPossibleNext(current):
     currNum = current.state
@@ -66,7 +87,7 @@ def getPossibleNext(current):
         
         #for each digit, ten possible variations
         for y in range(0, 10):
-           next = tmpNum + y * offset
+           next = int(tmpNum + y * offset)
            
            if (next in table):
                continue
@@ -74,11 +95,11 @@ def getPossibleNext(current):
            table[next] = 1
             
            #discard the number starts with 0
-           if len(str(int(next)))==length:
+           if len(str(next))==length:
                #check if the number is a prime
-               if isPrime(int(next)):
+               if isPrime(next):
                    #add the number to list
-                   tmpNode = Node(int(next))
+                   tmpNode = Node(next)
                    tmpNode.parent = current
                    tmpNode.distFromGoal = current.distFromGoal + 1
                    next_list.append(tmpNode)
@@ -87,6 +108,7 @@ def getPossibleNext(current):
 
 def Astar(start, target):
     global solvable
+    global visited
     pq = queue.PriorityQueue()
     pq.put(start)
 
@@ -96,6 +118,7 @@ def Astar(start, target):
 
     while not pq.empty():
         tmpNode = pq.get()
+        visited = visited + 1
         
         tmpList = getPossibleNext(tmpNode)      
        
@@ -104,6 +127,7 @@ def Astar(start, target):
                 solvable = True
                 return x
             tmpHammDist = hammingDistance(x.state, target)
+            x.nextPossible = peekPossibleNext(x.state)
             x.distToGoal = tmpHammDist
             pq.put(x)
 
@@ -130,9 +154,10 @@ def main():
         root.distFromGoal = 0
 
         table[startPrime] = 1
-
+#startTime = time.clock()
         result = Astar(root, endPrime)
-            
+#print("--- %.5f seconds ---" % (time.clock() - startTime))
+#print('visited nodes: ', visited)         
         if (solvable):
             stack = list()
             while (result != None):
